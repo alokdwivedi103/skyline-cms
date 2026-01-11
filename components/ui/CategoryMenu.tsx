@@ -2,33 +2,59 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaChevronDown } from 'react-icons/fa';
+import { BiChevronDown } from 'react-icons/bi';
 
 interface Category {
   _id: string;
   name: string;
   slug: string;
-  parentCategory?: string;
+  image?: string;
+}
+
+interface Product {
+  _id: string;
+  title: string;
+  slug: string;
+  images: string[];
+  price: {
+    original: number;
+    discounted?: number;
+  };
 }
 
 export default function CategoryMenu() {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+  const [categoryProducts, setCategoryProducts] = useState<{ [key: string]: Product[] }>({});
 
   useEffect(() => {
-    fetchCategories();
+    fetch('/api/categories?parentsOnly=true')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setCategories(data.data);
+        }
+      })
+      .catch(err => console.error('Error fetching categories:', err));
   }, []);
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories?parentOnly=true');
-      const data = await response.json();
-
-      if (data.success) {
-        setCategories(data.data);
+  const handleCategoryHover = async (categoryId: string, categorySlug: string) => {
+    setHoveredCategory(categoryId);
+    
+    // Fetch products for this category if not already loaded
+    if (!categoryProducts[categoryId]) {
+      try {
+        const res = await fetch(`/api/products?category=${categoryId}&limit=6`);
+        const data = await res.json();
+        if (data.success && data.data.length > 0) {
+          setCategoryProducts(prev => ({
+            ...prev,
+            [categoryId]: data.data
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching category products:', err);
       }
-    } catch (error) {
-      console.error('Error fetching categories:', error);
     }
   };
 
@@ -48,16 +74,55 @@ export default function CategoryMenu() {
           <li
             key={category._id}
             className="relative"
-            onMouseEnter={() => setActiveCategory(category._id)}
-            onMouseLeave={() => setActiveCategory(null)}
+            onMouseEnter={() => handleCategoryHover(category._id, category.slug)}
+            onMouseLeave={() => setHoveredCategory(null)}
           >
             <Link
               href={`/categories/${category.slug}`}
-              className="flex items-center space-x-1 text-sm font-medium text-primary hover:text-secondary transition-colors"
+              className="text-sm flex gap-1 items-center font-medium text-primary hover:text-secondary transition-colors"
             >
-              <span>{category.name}</span>
-              <FaChevronDown className="w-3 h-3" />
+              {category.name}<BiChevronDown className="size-6" />
             </Link>
+
+            {/* Dropdown with products */}
+            {hoveredCategory === category._id && categoryProducts[category._id] && categoryProducts[category._id].length > 0 && (
+              <div className="absolute left-0 top-full w-96 bg-white shadow-2xl rounded-b-lg z-50 border-t-4 border-secondary mt-2">
+                <div className="p-4">
+                  <h3 className="text-primary font-semibold mb-3 text-sm uppercase">
+                    Popular in {category.name}
+                  </h3>
+                  <div className="space-y-2">
+                    {categoryProducts[category._id].slice(0, 4).map((product) => (
+                      <Link
+                        key={product._id}
+                        href={`/products/${product.slug}`}
+                        className="flex gap-3 p-2 hover:bg-background-light rounded transition-colors"
+                      >
+                        <img
+                          src={product.images[0] || '/placeholder-book.jpg'}
+                          alt={product.title}
+                          className="w-12 h-16 object-cover rounded"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-800 font-medium line-clamp-2">
+                            {product.title}
+                          </p>
+                          <p className="text-secondary font-semibold text-sm mt-1">
+                            ₹{product.price.discounted || product.price.original}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link
+                    href={`/categories/${category.slug}`}
+                    className="block mt-3 text-center text-primary hover:text-secondary font-semibold text-sm py-2 border-t"
+                  >
+                    View All {category.name} →
+                  </Link>
+                </div>
+              </div>
+            )}
           </li>
         ))}
 

@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { FaShoppingCart, FaEye } from 'react-icons/fa';
+import { FaShoppingCart, FaEye, FaMinus, FaPlus } from 'react-icons/fa';
+import { useCart } from '@/context/CartContext';
 
 interface ProductCardProps {
   product: {
@@ -20,10 +21,38 @@ interface ProductCardProps {
     isNewRelease?: boolean;
   };
   onQuickView?: (productId: string) => void;
-  onAddToCart?: (productId: string) => void;
 }
 
-export default function ProductCard({ product, onQuickView, onAddToCart }: ProductCardProps) {
+export default function ProductCard({ product, onQuickView }: ProductCardProps) {
+  const { cart, addToCart, updateQuantity } = useCart();
+  
+  // Check if product is in cart and get quantity
+  const cartItem = cart.find(item => item._id === product._id);
+  const quantityInCart = cartItem?.quantity || 0;
+
+  const handleAddToCart = () => {
+    addToCart({
+      _id: product._id,
+      title: product.title,
+      slug: product.slug,
+      images: product.images,
+      price: product.price,
+      author: product.author,
+    });
+  };
+
+  const handleIncreaseQuantity = () => {
+    if (cartItem) {
+      updateQuantity(product._id, cartItem.quantity + 1);
+    }
+  };
+
+  const handleDecreaseQuantity = () => {
+    if (cartItem) {
+      updateQuantity(product._id, cartItem.quantity - 1);
+    }
+  };
+
   const discount = product.price.discounted
     ? Math.round(((product.price.original - product.price.discounted) / product.price.original) * 100)
     : 0;
@@ -61,15 +90,13 @@ export default function ProductCard({ product, onQuickView, onAddToCart }: Produ
               <FaEye className="w-5 h-5" />
             </button>
           )}
-          {onAddToCart && (
-            <button
-              onClick={() => onAddToCart(product._id)}
-              className="bg-secondary text-white p-3 rounded-full hover:bg-secondary-dark transition-all transform scale-0 group-hover:scale-100"
-              title="Add to Cart"
-            >
-              <FaShoppingCart className="w-5 h-5" />
-            </button>
-          )}
+          <button
+            onClick={handleAddToCart}
+            className="bg-secondary text-white p-3 rounded-full hover:bg-secondary-dark transition-all transform scale-0 group-hover:scale-100"
+            title="Add to Cart"
+          >
+            <FaShoppingCart className="w-5 h-5" />
+          </button>
         </div>
       </div>
 
@@ -96,13 +123,33 @@ export default function ProductCard({ product, onQuickView, onAddToCart }: Produ
           )}
         </div>
 
-        {/* Buy Now Button */}
-        <button
-          onClick={() => onAddToCart && onAddToCart(product._id)}
-          className="w-full btn btn-secondary text-sm py-2"
-        >
-          Buy Now
-        </button>
+        {/* Buy Now / Quantity Controls */}
+        {quantityInCart > 0 ? (
+          <div className="flex items-center justify-between bg-secondary text-white rounded-lg overflow-hidden">
+            <button
+              onClick={handleDecreaseQuantity}
+              className="px-4 py-2 hover:bg-secondary-dark transition-colors flex-shrink-0"
+            >
+              <FaMinus className="w-3 h-3" />
+            </button>
+            <span className="flex-1 text-center font-semibold py-2">
+              {quantityInCart} in Cart
+            </span>
+            <button
+              onClick={handleIncreaseQuantity}
+              className="px-4 py-2 hover:bg-secondary-dark transition-colors flex-shrink-0"
+            >
+              <FaPlus className="w-3 h-3" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleAddToCart}
+            className="w-full btn btn-secondary text-sm py-2"
+          >
+            Buy Now
+          </button>
+        )}
       </div>
     </div>
   );

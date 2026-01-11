@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { FaSearch, FaShoppingCart, FaUser, FaBars, FaTimes, FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 import SearchBar from './SearchBar';
 import CategoryMenu from '../ui/CategoryMenu';
+import { useCart } from '@/context/CartContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const { getCartCount } = useCart();
+  const cartCount = getCartCount();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,9 +49,6 @@ export default function Header() {
               </Link>
               <Link href="/contact" className="hover:text-secondary transition-colors">
                 Contact
-              </Link>
-              <Link href="/blog" className="hover:text-secondary transition-colors hidden md:block">
-                Blog
               </Link>
             </div>
           </div>

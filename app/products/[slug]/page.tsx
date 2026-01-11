@@ -1,21 +1,75 @@
+'use client';
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { FaShoppingCart, FaHeart, FaShare } from 'react-icons/fa';
+import { FaShoppingCart, FaHeart, FaShare, FaMinus, FaPlus } from 'react-icons/fa';
+import { useCart } from '@/context/CartContext';
+import { useEffect, useState } from 'react';
 
-async function getProduct(slug: string) {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/products/${slug}`, {
-      cache: 'no-store',
-    });
-    const data = await response.json();
-    return data.success ? data.data : null;
-  } catch (error) {
-    return null;
+
+export default function ProductDetailPage({ params }: { params: { slug: string } }) {
+  const [product, setProduct] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { cart, addToCart, updateQuantity } = useCart();
+  
+  // Check if product is in cart and get quantity
+  const cartItem = product ? cart.find(item => item._id === product._id) : null;
+  const quantityInCart = cartItem?.quantity || 0;
+
+  useEffect(() => {
+    async function fetchProduct() {
+      try {
+        const response = await fetch(`/api/products/${params.slug}`);
+        const data = await response.json();
+        if (data.success) {
+          setProduct(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchProduct();
+  }, [params.slug]);
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart({
+        _id: product._id,
+        title: product.title,
+        slug: product.slug,
+        images: product.images,
+        price: product.price,
+        author: product.author,
+      });
+    }
+  };
+
+  const handleIncreaseQuantity = () => {
+    if (product && cartItem) {
+      updateQuantity(product._id, cartItem.quantity + 1);
+    }
+  };
+
+  const handleDecreaseQuantity = () => {
+    if (product && cartItem) {
+      updateQuantity(product._id, cartItem.quantity - 1);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="py-16">
+        <div className="container-custom">
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="mt-4 text-gray-600">Loading product...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
-}
-
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug);
 
   if (!product) {
     notFound();
@@ -121,10 +175,34 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
 
             {/* Actions */}
             <div className="flex gap-4 mb-6">
-              <button className="flex-1 btn btn-secondary">
-                <FaShoppingCart className="mr-2" />
-                Add to Cart
-              </button>
+              {quantityInCart > 0 ? (
+                <div className="flex-1 flex items-center justify-between bg-secondary text-white rounded-lg overflow-hidden">
+                  <button
+                    onClick={handleDecreaseQuantity}
+                    className="px-6 py-3 hover:bg-secondary-dark transition-colors flex-shrink-0"
+                  >
+                    <FaMinus className="w-4 h-4" />
+                  </button>
+                  <span className="flex-1 text-center font-semibold text-lg py-3">
+                    {quantityInCart} in Cart
+                  </span>
+                  <button
+                    onClick={handleIncreaseQuantity}
+                    className="px-6 py-3 hover:bg-secondary-dark transition-colors flex-shrink-0"
+                  >
+                    <FaPlus className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0}
+                  className="flex-1 btn btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaShoppingCart className="w-5 h-5" />
+                  {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                </button>
+              )}
               <button className="btn btn-outline">
                 <FaHeart />
               </button>

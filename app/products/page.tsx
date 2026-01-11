@@ -54,10 +54,6 @@ export default function ProductsPage() {
     }
   };
 
-  const handleAddToCart = (productId: string) => {
-    console.log('Add to cart:', productId);
-  };
-
   const handleQuickView = (productId: string) => {
     console.log('Quick view:', productId);
   };
@@ -118,7 +114,6 @@ export default function ProductsPage() {
                 <ProductCard
                   key={product._id}
                   product={product}
-                  onAddToCart={handleAddToCart}
                   onQuickView={handleQuickView}
                 />
               ))}

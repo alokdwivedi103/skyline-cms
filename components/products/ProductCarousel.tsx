@@ -25,10 +25,9 @@ interface ProductCarouselProps {
   title: string;
   products: Product[];
   onQuickView?: (productId: string) => void;
-  onAddToCart?: (productId: string) => void;
 }
 
-export default function ProductCarousel({ title, products, onQuickView, onAddToCart }: ProductCarouselProps) {
+export default function ProductCarousel({ title, products, onQuickView }: ProductCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerView, setItemsPerView] = useState(4);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -114,7 +113,6 @@ export default function ProductCarousel({ title, products, onQuickView, onAddToC
                 <ProductCard
                   product={product}
                   onQuickView={onQuickView}
-                  onAddToCart={onAddToCart}
                 />
               </motion.div>
             ))}

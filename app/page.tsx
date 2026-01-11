@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import HeroSlider from '@/components/ui/HeroSlider';
 import ProductCarousel from '@/components/products/ProductCarousel';
-import Link from 'next/link';
-import { FaBook, FaGavel, FaGraduationCap, FaFileAlt } from 'react-icons/fa';
 
 interface Product {
   _id: string;
@@ -22,48 +21,50 @@ interface Product {
   isNewRelease?: boolean;
 }
 
-export default function HomePage() {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+interface Category {
+  _id: string;
+  name: string;
+  slug: string;
+  image?: string;
+}
+
+export default function Home() {
   const [newReleases, setNewReleases] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      // Fetch featured products
-      const featuredRes = await fetch('/api/products?featured=true&limit=8');
-      const featuredData = await featuredRes.json();
-
-      // Fetch new releases
-      const newReleasesRes = await fetch('/api/products?newRelease=true&limit=8');
-      const newReleasesData = await newReleasesRes.json();
-
-      if (featuredData.success) {
-        setFeaturedProducts(featuredData.data);
-      }
-
-      if (newReleasesData.success) {
-        setNewReleases(newReleasesData.data);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddToCart = (productId: string) => {
-    // TODO: Implement cart functionality
-    console.log('Add to cart:', productId);
-  };
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const handleQuickView = (productId: string) => {
-    // TODO: Implement quick view modal
     console.log('Quick view:', productId);
   };
+
+  useEffect(() => {
+    // Fetch new releases
+    fetch('/api/products?isNewRelease=true&limit=8')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setNewReleases(data.data);
+        }
+      });
+
+    // Fetch featured products
+    fetch('/api/products?isFeatured=true&limit=8')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setFeaturedProducts(data.data);
+        }
+      });
+
+    // Fetch categories
+    fetch('/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setCategories(data.data.slice(0, 4)); // Get first 4 categories
+        }
+      });
+  }, []);
 
   return (
     <div>
@@ -73,25 +74,28 @@ export default function HomePage() {
       {/* Categories Section */}
       <section className="py-16 bg-background-light">
         <div className="container-custom">
-          <h2 className="text-3xl font-serif font-bold text-center text-primary mb-12">
+          <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
             Browse by Category
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: 'Bare Acts', icon: FaBook, slug: 'bare-acts', color: 'bg-blue-500' },
-              { name: 'Legal Commentaries', icon: FaGavel, slug: 'commentaries', color: 'bg-red-500' },
-              { name: 'Question & Answer', icon: FaGraduationCap, slug: 'question-answer', color: 'bg-green-500' },
-              { name: 'Law Books', icon: FaFileAlt, slug: 'law-books', color: 'bg-purple-500' },
-            ].map((category) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {categories.map((category) => (
               <Link
-                key={category.slug}
-                href={`/categories/${category.slug}`}
-                className="group card card-hover p-8 text-center"
+                key={category._id}
+                href={`/products?category=${category.slug}`}
+                className="card group hover:shadow-xl transition-all duration-300"
               >
-                <div className={`${category.color} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
-                  <category.icon className="w-8 h-8 text-white" />
+                <div className="aspect-square bg-gradient-to-br from-primary to-primary-dark rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  {category.image ? (
+                    <img 
+                      src={category.image} 
+                      alt={category.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <span className="text-6xl text-white">📚</span>
+                  )}
                 </div>
-                <h3 className="font-serif font-semibold text-lg text-primary group-hover:text-secondary transition-colors">
+                <h3 className="text-lg font-semibold text-center group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
               </Link>
@@ -105,7 +109,6 @@ export default function HomePage() {
         <ProductCarousel
           title="Newly Released Bare Acts"
           products={newReleases}
-          onAddToCart={handleAddToCart}
           onQuickView={handleQuickView}
         />
       )}
@@ -116,7 +119,6 @@ export default function HomePage() {
           <ProductCarousel
             title="Legal Masterpieces, All in One"
             products={featuredProducts}
-            onAddToCart={handleAddToCart}
             onQuickView={handleQuickView}
           />
         </section>
