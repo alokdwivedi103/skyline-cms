@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { FaShoppingCart, FaEye, FaMinus, FaPlus } from 'react-icons/fa';
+import { FaShoppingCart, FaEye, FaMinus, FaPlus, FaHeart } from 'react-icons/fa';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface ProductCardProps {
   product: {
@@ -17,14 +20,14 @@ interface ProductCardProps {
       currency: string;
     };
     author?: string;
-    isFeatured?: boolean;
-    isNewRelease?: boolean;
   };
   onQuickView?: (productId: string) => void;
 }
 
 export default function ProductCard({ product, onQuickView }: ProductCardProps) {
   const { cart, addToCart, updateQuantity } = useCart();
+  const { isAuthenticated, token } = useAuth();
+  const [isWishlisted, setIsWishlisted] = useState(false); // Ideally fetch this state from props or context
   
   // Check if product is in cart and get quantity
   const cartItem = cart.find(item => item._id === product._id);
@@ -48,8 +51,34 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
   };
 
   const handleDecreaseQuantity = () => {
-    if (cartItem) {
+    if (cartItem && cartItem.quantity > 0) {
       updateQuantity(product._id, cartItem.quantity - 1);
+    }
+  };
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      // You might want to redirect to login or show a toast
+      alert('Please login to use wishlist');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/users/wishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId: product._id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setIsWishlisted(!isWishlisted);
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
     }
   };
 
@@ -58,45 +87,36 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
     : 0;
 
   return (
-    <div className="product-card group">
-      {/* Image Container */}
-      <div className="relative overflow-hidden bg-gray-100">
+    <div className="card group relative overflow-hidden">
+      {/* Product Image */}
+      <div className="relative aspect-[3/4] overflow-hidden rounded-t-lg bg-gray-100">
         <Link href={`/products/${product.slug}`}>
-          <img
+          <Image
             src={product.images[0] || '/placeholder-book.jpg'}
             alt={product.title}
-            className="product-card-image"
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
-
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {product.isNewRelease && (
-            <span className="badge badge-new">NEW</span>
-          )}
-          {discount > 0 && (
-            <span className="badge badge-sale">-{discount}%</span>
-          )}
-        </div>
-
-        {/* Quick Actions - Show on Hover */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100">
+        {/* Quick Actions Overlay */}
+        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+          <button
+            onClick={handleToggleWishlist}
+            className={`p-3 rounded-full bg-white transition-colors hover:bg-secondary hover:text-white ${isWishlisted ? 'text-red-500' : 'text-primary'}`}
+            title="Add to Wishlist"
+          >
+            <FaHeart className="w-5 h-5" />
+          </button>
+          
           {onQuickView && (
             <button
               onClick={() => onQuickView(product._id)}
-              className="bg-white text-primary p-3 rounded-full hover:bg-primary hover:text-white transition-all transform scale-0 group-hover:scale-100"
+              className="p-3 rounded-full bg-white text-primary hover:bg-secondary hover:text-white transition-colors"
               title="Quick View"
             >
               <FaEye className="w-5 h-5" />
             </button>
           )}
-          <button
-            onClick={handleAddToCart}
-            className="bg-secondary text-white p-3 rounded-full hover:bg-secondary-dark transition-all transform scale-0 group-hover:scale-100"
-            title="Add to Cart"
-          >
-            <FaShoppingCart className="w-5 h-5" />
-          </button>
         </div>
       </div>
 
