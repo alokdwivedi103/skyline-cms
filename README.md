@@ -1,4 +1,4 @@
-# Skyline Law Agency
+# Skyline Publications
 
 A modern e-commerce platform for legal books and resources built with Next.js and MongoDB.
 
@@ -139,4 +139,4 @@ MIT
 
 ## Support
 
-For support, email support@skylinelawagency.com
+For support, email support@skylinepublications.com

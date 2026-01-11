@@ -63,13 +63,13 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-2">
               <div className="bg-primary text-white p-2 rounded-lg">
-                <span className="text-2xl font-serif font-bold">SLA</span>
+                <span className="text-2xl font-serif font-bold">SP</span>
               </div>
               <div className="hidden md:block">
                 <h1 className="text-xl font-serif font-bold text-primary leading-tight">
-                  Skyline Law Agency
+                  Skyline Publications
                 </h1>
-                <p className="text-xs text-gray-600">Legal Excellence Since 2024</p>
+                <p className="text-xs text-gray-600">Your Trusted Legal Publisher</p>
               </div>
             </Link>
 

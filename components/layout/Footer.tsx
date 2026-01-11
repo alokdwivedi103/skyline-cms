@@ -81,9 +81,9 @@ export default function Footer() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="bg-white text-primary p-2 rounded-lg">
-                  <span className="text-xl font-serif font-bold">SLA</span>
+                  <span className="text-xl font-serif font-bold">SP</span>
                 </div>
-                <h3 className="text-lg font-serif font-bold">Skyline Law Agency</h3>
+                <h3 className="text-lg font-serif font-bold">Skyline Publications</h3>
               </div>
               <p className="text-gray-300 text-sm mb-4">
                 Focus on seamless communication and collaboration. Embrace challenges with confidence and foster 
@@ -188,7 +188,7 @@ export default function Footer() {
       <div className="border-t border-primary-light py-6">
         <div className="container-custom">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-300">
-            <p>© 2024 Skyline Law Agency. All rights reserved.</p>
+            <p>© 2024 Skyline Publications. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/terms" className="hover:text-white transition-colors">
                 Terms & Conditions

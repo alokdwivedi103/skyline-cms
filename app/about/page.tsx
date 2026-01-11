@@ -7,7 +7,7 @@ export default function AboutPage() {
       <section className="bg-gradient-to-r from-primary to-primary-dark text-white py-20">
         <div className="container-custom text-center">
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-6">
-            About Skyline Law Agency
+            About Skyline Publications
           </h1>
           <p className="text-xl text-gray-200 max-w-3xl mx-auto">
             Your trusted partner in legal education and professional development since 2024
@@ -24,7 +24,7 @@ export default function AboutPage() {
                 Our Mission
               </h2>
               <p className="text-gray-700 mb-4 leading-relaxed">
-                At Skyline Law Agency, we are dedicated to providing legal professionals, students, and enthusiasts 
+                At Skyline Publications, we are dedicated to providing legal professionals, students, and enthusiasts 
                 with access to the most comprehensive and up-to-date legal resources available.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed">

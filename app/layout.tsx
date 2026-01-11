@@ -18,9 +18,9 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "Skyline Law Agency - Legal Books & Resources",
-  description: "Your trusted source for legal books, bare acts, and law resources. Browse our extensive collection of legal literature.",
-  keywords: "law books, legal resources, bare acts, legal literature, law agency",
+  title: "Skyline Publications - Legal Books & Resources",
+  description: "Your trusted publisher for legal books, bare acts, and law resources. Browse our extensive collection of legal literature.",
+  keywords: "law books, legal resources, bare acts, legal literature, legal publisher, skyline publications",
 };
 
 export default function RootLayout({
