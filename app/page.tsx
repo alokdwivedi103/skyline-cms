@@ -72,33 +72,37 @@ export default function Home() {
       <HeroSlider />
 
       {/* Categories Section */}
-      <section className="py-16 bg-background-light">
+      <section className="py-12 md:py-16 bg-background-light">
         <div className="container-custom">
-          <h2 className="text-3xl font-serif font-bold text-primary mb-8 text-center">
+          <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-6 md:mb-8 text-center">
             Browse by Category
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {/* Mobile: Horizontal Scroll, Desktop: Grid */}
+          <div className="flex overflow-x-auto pb-6 -mx-4 px-4 md:grid md:grid-cols-4 md:gap-6 md:mx-0 md:px-0 md:pb-0 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {categories.map((category) => (
-              <Link
-                key={category._id}
-                href={`/products?category=${category.slug}`}
-                className="card group hover:shadow-xl transition-all duration-300"
-              >
-                <div className="aspect-square bg-gradient-to-br from-primary to-primary-dark rounded-lg mb-4 flex items-center justify-center overflow-hidden">
-                  {category.image ? (
-                    <img 
-                      src={category.image} 
-                      alt={category.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                  ) : (
-                    <span className="text-6xl text-white">📚</span>
-                  )}
-                </div>
-                <h3 className="text-lg font-semibold text-center group-hover:text-primary transition-colors">
-                  {category.name}
-                </h3>
-              </Link>
+              <div key={category._id} className="min-w-[160px] md:min-w-0 pr-4 md:pr-0 snap-center">
+                <Link
+                  href={`/products?category=${category.slug}`}
+                  className="block h-full card group hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="aspect-square bg-gradient-to-br from-primary to-primary-dark rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                    {category.image ? (
+                      <img 
+                        src={category.image} 
+                        alt={category.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      />
+                    ) : (
+                      <span className="text-5xl md:text-6xl text-white">📚</span>
+                    )}
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-primary bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300" />
+                  </div>
+                  <h3 className="text-base mb-1 md:text-lg font-semibold text-center group-hover:text-primary transition-colors line-clamp-1">
+                    {category.name}
+                  </h3>
+                </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -125,17 +129,17 @@ export default function Home() {
       )}
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-primary to-primary-dark text-white">
-        <div className="container-custom text-center">
-          <h2 className="text-4xl font-serif font-bold mb-6">
+      <section className="py-12 md:py-20 bg-gradient-to-r from-primary to-primary-dark text-white">
+        <div className="container-custom text-center px-4">
+          <h2 className="text-2xl md:text-4xl font-serif font-bold mb-4 md:mb-6">
             Download Our Complete Catalogue
           </h2>
-          <p className="text-xl mb-8 text-gray-200 max-w-2xl mx-auto">
+          <p className="text-base md:text-xl mb-6 md:mb-8 text-gray-200 max-w-2xl mx-auto">
             Get access to our comprehensive collection of legal books, bare acts, and resources
           </p>
           <Link
             href="/catalogue"
-            className="inline-block bg-secondary hover:bg-secondary-dark text-white px-10 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 shadow-lg"
+            className="inline-block bg-secondary hover:bg-secondary-dark text-white px-6 py-3 md:px-10 md:py-4 rounded-lg font-semibold text-base md:text-lg transition-all transform hover:scale-105 shadow-lg"
           >
             Download Catalogue
           </Link>

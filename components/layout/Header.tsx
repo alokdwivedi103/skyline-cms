@@ -6,6 +6,7 @@ import { FaSearch, FaShoppingCart, FaUser, FaBars, FaTimes, FaFacebook, FaTwitte
 import SearchBar from './SearchBar';
 import CategoryMenu from '../ui/CategoryMenu';
 import { useCart } from '@/context/CartContext';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,6 +14,7 @@ export default function Header() {
   const { getCartCount } = useCart();
   const cartCount = getCartCount();
 
+  const path = usePathname();
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -21,6 +23,10 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [path]);
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md">

@@ -84,8 +84,13 @@ export default function HeroSlider() {
     }),
   };
 
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
   return (
-    <div className="relative h-[500px] md:h-[600px] bg-gradient-to-r from-primary to-primary-dark overflow-hidden">
+    <div className="relative h-[600px] md:h-[600px] bg-gradient-to-r from-primary to-primary-dark overflow-hidden group group">
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={currentSlide}
@@ -98,7 +103,19 @@ export default function HeroSlider() {
             x: { type: 'spring', stiffness: 300, damping: 30 },
             opacity: { duration: 0.2 },
           }}
-          className="absolute inset-0"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={1}
+          onDragEnd={(e, { offset, velocity }) => {
+            const swipe = swipePower(offset.x, velocity.x);
+
+            if (swipe < -swipeConfidenceThreshold) {
+              handleNext();
+            } else if (swipe > swipeConfidenceThreshold) {
+              handlePrev();
+            }
+          }}
+          className="absolute inset-0 cursor-grab active:cursor-grabbing"
         >
           {/* Background Image */}
           <div
@@ -110,7 +127,7 @@ export default function HeroSlider() {
 
           {/* Content */}
           <div className="relative h-full flex items-center">
-            <div className="container-custom">
+            <div className="container-custom px-4">
               <div className="max-w-2xl text-white">
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
@@ -124,7 +141,7 @@ export default function HeroSlider() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
-                  className="text-4xl md:text-6xl text-white font-serif font-bold mb-6"
+                  className="text-4xl md:text-6xl text-white font-serif font-bold mb-6 leading-tight"
                 >
                   {slides[currentSlide].title}
                 </motion.h1>
@@ -154,19 +171,24 @@ export default function HeroSlider() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={handlePrev}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white p-3 rounded-full transition-all z-10"
-      >
-        <FaChevronLeft className="w-6 h-6" />
-      </button>
-      <button
-        onClick={handleNext}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-30 hover:bg-opacity-50 text-white p-3 rounded-full transition-all z-10"
-      >
-        <FaChevronRight className="w-6 h-6" />
-      </button>
+      {/* Navigation Arrows - Hidden on mobile, visible on group hover for desktop */}
+      <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Navigation Arrows - Hidden on mobile, visible on group hover for desktop */}
+      <div className="hidden md:block opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <button
+          onClick={handlePrev}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 backdrop-blur-sm text-white p-4 rounded-full transition-all z-10"
+        >
+          <FaChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={handleNext}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 backdrop-blur-sm text-white p-4 rounded-full transition-all z-10"
+        >
+          <FaChevronRight className="w-6 h-6" />
+        </button>
+      </div>
+      </div>
 
       {/* Dots Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-10">

@@ -86,7 +86,7 @@ export default function CategoryMenu() {
 
             {/* Dropdown with products */}
             {hoveredCategory === category._id && categoryProducts[category._id] && categoryProducts[category._id].length > 0 && (
-              <div className="absolute left-0 top-full w-96 bg-white shadow-2xl rounded-b-lg z-50 border-t-4 border-secondary mt-2">
+              <div className="absolute left-0 top-full w-96 bg-white shadow-2xl rounded-b-lg z-50 border-t-4 border-secondary mt-2 before:absolute before:-top-4 before:left-0 before:w-full before:h-4 before:bg-transparent">
                 <div className="p-4">
                   <h3 className="text-primary font-semibold mb-3 text-sm uppercase">
                     Popular in {category.name}

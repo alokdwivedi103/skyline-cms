@@ -42,12 +42,12 @@ export default function Footer() {
       <div className="bg-primary-dark py-12">
         <div className="container-custom">
           <div className="max-w-2xl">
-            <h3 className="text-2xl font-serif font-bold mb-2">Join Us-</h3>
+            <h3 className="text-2xl font-serif text-white font-bold mb-2">Join Us</h3>
             <p className="text-gray-300 mb-6">
               Become a part of our community and gain access to expert knowledge and resources. 
               Join us to stay ahead in your legal journey with fresh insights and exclusive content.
             </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex gap-4">
+            <form onSubmit={handleNewsletterSubmit} className="flex lg:flex-row flex-col gap-4">
               <input
                 type="email"
                 value={email}
